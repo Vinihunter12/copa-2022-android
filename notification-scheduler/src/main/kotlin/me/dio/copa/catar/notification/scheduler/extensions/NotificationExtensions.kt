@@ -1,10 +1,13 @@
 package me.dio.copa.catar.notification.scheduler.extensions
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import me.dio.copa.catar.notification.scheduler.R
@@ -17,9 +20,16 @@ fun Context.showNotification(title: String, content: String) {
     createNotificationChannel()
     val notification = getNotification(title, content)
 
-    NotificationManagerCompat
-        .from(this)
-        .notify(content.hashCode(), notification)
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        NotificationManagerCompat
+            .from(this)
+            .notify(content.hashCode(), notification)
+        return
+    }
 }
 
 private fun Context.createNotificationChannel() {
